@@ -65,7 +65,11 @@ def group_dots_into_lines(dots, y_tolerance=20):
         return []
     
     try:
+        # Extract all unique y-coordinates and sort them
         y_coords = sorted({dot[1] for dot in dots})
+        if not y_coords:
+            return []
+            
         lines = []
         current_line = [y_coords[0]]
         
@@ -75,13 +79,17 @@ def group_dots_into_lines(dots, y_tolerance=20):
             else:
                 lines.append(current_line)
                 current_line = [y]
-        lines.append(current_line)
+        
+        if current_line:
+            lines.append(current_line)
         
         grouped_lines = []
         for line in lines:
-            line_y = sum(line) // len(line)
-            line_dots = [dot for dot in dots if abs(dot[1] - line_y) < y_tolerance]
-            grouped_lines.append(sorted(line_dots, key=lambda x: x[0]))
+            if line:  # Check if line is not empty
+                line_y = sum(line) // len(line)
+                line_dots = [dot for dot in dots if abs(dot[1] - line_y) < y_tolerance]
+                grouped_lines.append(sorted(line_dots, key=lambda x: x[0]))
+        
         return grouped_lines
     except Exception as e:
         logger.error(f"Line grouping failed: {str(e)}")
